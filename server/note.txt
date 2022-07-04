@@ -1,0 +1,83 @@
+------------------------------TABLEs--------------------------------------
+CREATE TABLE [User] (
+    user_id INT IDENTITY(1, 1) PRIMARY KEY,
+    nickname NVARCHAR(100) NOT NULL,
+    username VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE [Post] (
+    post_id INT IDENTITY(1, 1) PRIMARY KEY,
+    user_id INT NOT NULL,
+    description TEXT,
+    address VARCHAR(255),
+    time_begin TIME,
+    time_end TIME,
+    star tinyint,
+    create_at DATETIME NOT NULL,
+    update_at DATETIME,
+    FOREIGN KEY(user_id) REFERENCES [User](user_id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE [Tag] (
+    tag_id INT IDENTITY(1, 1) PRIMARY KEY,
+    name CHAR(50)
+)
+
+CREATE TABLE [Post_Tag] (
+    post_id INT NOT NULL,
+    tag_id INT NOT NULL,
+    PRIMARY KEY(post_id, tag_id),
+    FOREIGN KEY(post_id) REFERENCES [Post](post_id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(tag_id) REFERENCES [Tag](tag_id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+CREATE TABLE [Post_Image] (
+    id INT IDENTITY(1, 1) PRIMARY KEY,
+    post_id INT NOT NULL,
+    image VARCHAR(255),
+    FOREIGN KEY(post_id) REFERENCES [Post](post_id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+CREATE TABLE [Like] (
+    post_id INT NOT NULL,
+    user_id INT NOT NULL,
+    PRIMARY KEY(post_id, user_id),
+    FOREIGN KEY(post_id) REFERENCES [Post](post_id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(user_id) REFERENCES [User](user_id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+CREATE TABLE [Comment] (
+    comment_id INT IDENTITY(1, 1) PRIMARY KEY,
+    post_id INT NOT NULL,
+    user_id INT NOT NULL,
+    content TEXT,
+    create_at DATETIME,
+    FOREIGN KEY(post_id) REFERENCES [Post](post_id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(user_id) REFERENCES [User](user_id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+CREATE TABLE [Like_Comment] (
+    comment_id INT NOT NULL,
+    user_id INT NOT NULL,
+    PRIMARY KEY(comment_id, user_id),
+    FOREIGN KEY(comment_id) REFERENCES [Comment](comment_id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(user_id) REFERENCES [User](user_id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+-------------------------------Query--------------------------------------
+
+** Authentication
+- Login:
+    + 
+
