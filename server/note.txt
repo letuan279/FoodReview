@@ -75,9 +75,61 @@ CREATE TABLE [Like_Comment] (
     ON DELETE CASCADE ON UPDATE CASCADE
 )
 
--------------------------------Query--------------------------------------
+-------------------------------API--------------------------------------
 
-** Authentication
-- Login:
-    + 
+** Authentication **
 
+@route: GET /api/auth
+@desc: Check if user is logged in
+@access: Public
+@requestData: {}
+@responseData: 
+    400: { success: false, message: "User not found" }
+    200: { success: true, user: {user_id: "", username: "", nickname: ""} }
+    500: { success: false, message: 'Server error' }
+    401: { success: false, message: "Token not found" }
+    403: { success: false, message: "Invalid token" }
+
+@route: POST /api/auth/register
+@desc: Register user
+@access: Public
+@requestData: {nickname: "", username: "", password: ""}
+@responseData: 
+    400: { success: false, message: 'Username already taken' }
+    200: { success: true, message: "Created a new user", accessToken }
+    500: { success: false, message: 'Server error' }
+
+@route: POST /api/auth/login
+@desc: Login user
+@access: Public
+@requestData: {username: "", password: ""}
+@responseData: 
+    400: { success: false, message: 'Incorrect username or password' }
+    200: { success: true, message: "login successfully", accessToken }
+    500: { success: false, message: 'Server error' }
+
+** Post **
+@route: GET /api/posts
+@desc: get all post
+@access: Private
+@requestData: {}
+@responseData: 
+    200: {
+        posts: [
+            {
+                post_id: "",
+                user_id: "",
+                nickname: "",
+                description: "",
+                address: "",
+                time_begin: "",
+                time_end: "",
+                star: "",
+                create_at: "",
+                update_at: "",
+                like: "",
+                comment: ""
+            },
+            {}
+        ]
+    }
