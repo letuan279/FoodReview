@@ -4,21 +4,21 @@ CREATE TABLE [User] (
     nickname NVARCHAR(100) NOT NULL,
     username VARCHAR(100) NOT NULL,
     password VARCHAR(100) NOT NULL
-);
+)
 
 CREATE TABLE [Post] (
     post_id INT IDENTITY(1, 1) PRIMARY KEY,
     user_id INT NOT NULL,
-    description TEXT,
-    address VARCHAR(255),
-    time_begin TIME,
-    time_end TIME,
+    description NTEXT,
+    address NVARCHAR(255),
+    time_begin DATETIME,
+    time_end DATETIME,
     star tinyint,
     create_at DATETIME NOT NULL,
     update_at DATETIME,
     FOREIGN KEY(user_id) REFERENCES [User](user_id)
     ON DELETE CASCADE ON UPDATE CASCADE
-);
+)
 
 CREATE TABLE [Tag] (
     tag_id INT IDENTITY(1, 1) PRIMARY KEY,
@@ -57,7 +57,7 @@ CREATE TABLE [Comment] (
     comment_id INT IDENTITY(1, 1) PRIMARY KEY,
     post_id INT NOT NULL,
     user_id INT NOT NULL,
-    content TEXT,
+    content NTEXT,
     create_at DATETIME,
     FOREIGN KEY(post_id) REFERENCES [Post](post_id)
     ON DELETE CASCADE ON UPDATE CASCADE,
@@ -81,7 +81,6 @@ CREATE TABLE [Like_Comment] (
 
 @route: GET /api/auth
 @desc: Check if user is logged in
-@access: Public
 @requestData: {}
 @responseData: 
     400: { success: false, message: "User not found" }
@@ -92,7 +91,6 @@ CREATE TABLE [Like_Comment] (
 
 @route: POST /api/auth/register
 @desc: Register user
-@access: Public
 @requestData: {nickname: "", username: "", password: ""}
 @responseData: 
     400: { success: false, message: 'Username already taken' }
@@ -101,17 +99,19 @@ CREATE TABLE [Like_Comment] (
 
 @route: POST /api/auth/login
 @desc: Login user
-@access: Public
 @requestData: {username: "", password: ""}
 @responseData: 
     400: { success: false, message: 'Incorrect username or password' }
     200: { success: true, message: "login successfully", accessToken }
     500: { success: false, message: 'Server error' }
 
+
+
 ** Post **
+
+
 @route: GET /api/posts
 @desc: get all post
-@access: Private
 @requestData: {}
 @responseData: 
     200: {
@@ -127,9 +127,114 @@ CREATE TABLE [Like_Comment] (
                 star: "",
                 create_at: "",
                 update_at: "",
-                like: "",
-                comment: ""
+                like: "", //so luot like
+                comment: "", //so luot comment
+                liked: "", // true false
+                tags: ["",""]
             },
-            {}
+            {
+                ...
+            }
         ]
     }
+
+@route: GET /api/rank
+@desc: get "like" rank
+@requestData: {}
+@responseData: 
+    200: {
+        [
+            {
+                user_id: "",
+                nickname: "",
+                like: "" //so luot like
+            },
+            {
+                ...
+            }
+        ]
+    }
+
+
+** Comment **
+
+
+@route: GET /api/comments
+@desc: get post's comments
+@requestData: {
+    post_id: ""
+}
+@responseData:
+    200: {
+        [
+            {
+                user_id: "",
+                nickname: "",
+                comment: "",
+                like: "", //so luot like
+                liked: ""
+            },
+            {
+                ...
+            }
+        ]
+    }
+
+@route: GET /api/like_comments
+@desc: like comments
+@requestData: {
+    post_id: "",
+    comment_id: ["", ""]
+}
+@responseData: 
+    200: {success: true, message: "liked comments"}
+
+
+@route: GET /api/add_comments
+@desc: write comment
+@requestData: {
+    post_id: "",
+    content: ""
+}
+@responseData: 
+    200: {success: true, message: "commented"}
+
+
+** My Post **
+
+@route: GET /api/my_posts
+@desc: get all my post
+@requestData: {
+    user_id: ""
+}
+@responseData: 
+    200: {
+        posts: [
+            { 
+                post_id: "",
+                user_id: "",
+                nickname: "",
+                description: "",
+                address: "",
+                time_begin: "",
+                time_end: "",
+                star: "",
+                create_at: "",
+                update_at: "",
+                like: "", //so luot like
+                comment: "", //so luot comment
+                liked: "", // true false
+                tags: ["",""]
+            },
+            {
+                ...
+            }
+        ]
+    }
+
+@route: GET /api/my_posts/edit
+@route: GET /api/my_posts/add
+
+** Search **
+
+-------------------------------------------------------------------------------------------------------------------
