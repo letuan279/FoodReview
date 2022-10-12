@@ -31,9 +31,7 @@ const PostModal = ({ choice, post, setIsCreate, setIsUpdate }) => {
         formData.append("time_begin", form.time_begin);
         formData.append("time_end", form.time_end);
         formData.append("star", form.star);
-        for (let i = 0; i < form.images.length; ++i) {
-            formData.append("images[]", form.images.item(i));
-        }
+        formData.append("picture", form.images[0]);
 
         console.log(formData);
 

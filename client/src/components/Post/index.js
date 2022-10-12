@@ -6,7 +6,7 @@ import axios from '../../api/axios';
 import { useAppContext } from '../../context/AppContext';
 
 
-const Post = ({ data, images, page, update, setIsSelect }) => {
+const Post = ({ data, page, update, setIsSelect }) => {
     const { handleAddMyPost, handleLikePost, increaseNumComment, authState: { user } } = useAppContext()
     const [visible, setVisible] = useState(false);
     const [commentInput, setCommentInput] = useState({
@@ -171,31 +171,12 @@ const Post = ({ data, images, page, update, setIsSelect }) => {
                     <div className="postText">{description}</div>
                     <div style={{ display: 'grid', justifyContent: 'center', alignContent: 'center' }}>
                         <Image
-                            preview={{
-                                visible: false,
-                            }}
                             className='postImg'
-                            src={images.length != 0 && `http://127.0.0.1:8000${images[0].image}`}
+                            src={`http://localhost:3000/${data.picture.url}`}
                             alt="Not thing"
                             onClick={() => setVisible(true)}
                             style={{ maxHeight: 500, maxWidth: 800, display: 'flex' }}
                         />
-                        <div
-                            style={{
-                                display: 'none'
-                            }}
-                        >
-                            <Image.PreviewGroup
-                                preview={{
-                                    visible,
-                                    onVisibleChange: (vis) => setVisible(vis),
-                                }}
-                            >
-                                {images.map((image, index) => (
-                                    <Image src={`http://127.0.0.1:8000${image.image}`} alt="Not thing" key={index} />
-                                ))}
-                            </Image.PreviewGroup>
-                        </div>
                     </div>
 
                 </div>

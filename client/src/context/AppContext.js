@@ -16,9 +16,7 @@ const initState = {
     user: null,
     isAuthenticated: false,
     posts: [],
-    myPosts: [],
-    ranks: [],
-    images: []
+    myPosts: []
 }
 
 const AppContextProvider = ({ children }) => {
@@ -122,12 +120,11 @@ const AppContextProvider = ({ children }) => {
         dispatch({
             type: SET_AUTH_BEGIN
         })
-        const responseData = await logoutAPI()
         localStorage.removeItem('token')
         dispatch({
             type: SET_AUTH_FAILED
         })
-        message.success(responseData.message)
+        message.success("Logout successfully")
     }
 
     const handleInfo = async () => {
@@ -137,25 +134,15 @@ const AppContextProvider = ({ children }) => {
             const getPostsData = getPosts.data
             // console.log(getPostsData.posts);
 
-            const getRanks = await axios.get('/ranks')
-            const getRanksData = getRanks.data
-            // console.log(getRanksData.ranks);
-
             const myPost = await axios.get('/my-posts')
             const myPostData = myPost.data
             // console.log(myPostData.myPosts);
-
-            const getImages = await axios.get('/images')
-            const getImagesData = getImages.data
-            // console.log(getImagesData.images);
 
             dispatch({
                 type: 'SET_DATA',
                 payload: {
                     posts: getPostsData.posts,
-                    ranks: getRanksData.ranks,
-                    myPosts: myPostData.myPosts,
-                    images: getImagesData.images
+                    myPosts: myPostData.myPosts
                 }
             })
 
@@ -167,15 +154,12 @@ const AppContextProvider = ({ children }) => {
     const handleAddMyPost = async () => {
         const myPost = await axios.get('/my-posts')
         const myPostData = myPost.data
-        const getImages = await axios.get('/images')
-        const getImagesData = getImages.data
         const getPosts = await axios.get('/posts')
         const getPostsData = getPosts.data
         dispatch({
             type: 'SET_DATA',
             payload: {
                 myPosts: myPostData.myPosts,
-                images: getImagesData.images,
                 posts: getPostsData.posts
             }
         })

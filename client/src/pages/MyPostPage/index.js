@@ -31,7 +31,7 @@ const MyPostPage = () => {
                 <Col span={6}></Col>
                 <Col span={12}>
                     {myPosts.map((post, index) => (
-                        <Post setIsSelect={setIsSelect} update={() => setIsUpdate(true)} page='myPost' key={index} data={post} images={images.filter((item) => item.post_id === post.post_id)} />
+                        <Post setIsSelect={setIsSelect} update={() => setIsUpdate(true)} page='myPost' key={index} data={post}/>
                     ))}
                 </Col>
                 <Col span={6}></Col>
