@@ -4,6 +4,7 @@ import { Button, Row, Col, Image, message, Menu, Dropdown, Space, Rate, Collapse
 import './index.css'
 import axios from '../../api/axios';
 import { useAppContext } from '../../context/AppContext';
+import moment from 'moment';
 
 
 const Post = ({ data, page, update, setIsSelect }) => {
@@ -14,41 +15,39 @@ const Post = ({ data, page, update, setIsSelect }) => {
         content: ""
     })
     const [commentList, setCommentList] = useState([])
-    // console.log(commentList);
-    const { address, description, liked, nickname, numComment, numLike, star, time_begin, time_end, post_id, user_id, updated_at } = data
+    const { address, description, liked, nickname, numComment, numLike, star, time_begin, time_end, id, user_id, updated_at } = data
     const [like, setLike] = useState(liked)
-    const [likedComment, setLikedComment] = useState('0')
     const [numLikeComment, setNumLikeComment] = useState({
         numLike: numLike,
-        numComment: numComment
+        numComment: numComment,
     })
-    // useEffect(async () => {
-    //     try {
-    //         const resNum = await axios.get(`/num-likes-comments/${post_id}`)
-    //         setNumLikeComment({
-    //             ...resNum.data.num[0]
-    //         })
-    //     } catch (error) {
-    //         message.error(error.message)
-    //     }
-    // }, [])
-
-    const [likeCommentNum, setLikeCommentNum] = useState('0')
 
     const likePost = async () => {
-        handleLikePost(post_id)
+        handleLikePost(id)
+        if(like == '1'){
+            setNumLikeComment({
+                ...numLikeComment,
+                numLike: numLikeComment.numLike - 1
+            })
+            setLike('0')
+        }else {
+            setNumLikeComment({
+                ...numLikeComment,
+                numLike: numLikeComment.numLike + 1
+            })
+            setLike('1')
+        }
     }
 
     const handleComment = async () => {
         try {
-            const res = await axios.post(`/add-comment/${post_id}`, { content: commentInput.content })
-            const resComment = await axios.get(`/comments/${post_id}`)
+            const res = await axios.post(`/add-comment/${id}`, { content: commentInput.content })
+            const resComment = await axios.get(`/comments/${id}`)
             setCommentList(resComment.data.comments)
-            // setNumLikeComment({
-            //     ...numLikeComment,
-            //     numComment: resComment.data.comments.length
-            // })
-            increaseNumComment(post_id)
+            setNumLikeComment({
+                ...numLikeComment,
+                numComment: numLikeComment.numComment + 1
+            })
 
         } catch (error) {
             message.error(error.message)
@@ -63,8 +62,7 @@ const Post = ({ data, page, update, setIsSelect }) => {
         }
         setCommentInput({ ...commentInput, toggle: true })
         try {
-            const res = await axios.get(`/comments/${post_id}`)
-            // console.log("comment: , post_id", res.data.comments, post_id);
+            const res = await axios.get(`/comments/${id}`)
             setCommentList(res.data.comments)
         } catch (error) {
             message.error(error.message)
@@ -74,12 +72,14 @@ const Post = ({ data, page, update, setIsSelect }) => {
     const handleLikeComment = async (comment_id) => {
         try {
             const res = await axios.get(`/like-comment/${comment_id}`)
+            console.log("data", res.data);
+            console.log("comment list", commentList);
             setCommentList(commentList.map((item) => {
-                if (item.comment_id === comment_id) {
+                if (item.id === comment_id) {
                     return {
                         ...item,
-                        Liked: item.Liked === '0' ? '1' : '0',
-                        numLike: res.data.result[0].numLikeComment
+                        Liked: item.Liked == '0' ? '1' : '0',
+                        numLike: res.data.result
                     }
                 }
                 return item
@@ -91,7 +91,7 @@ const Post = ({ data, page, update, setIsSelect }) => {
 
     const handleDelete = async () => {
         try {
-            const res = await axios.get(`/delete-post/${post_id}`)
+            const res = await axios.get(`/delete-post/${id}`)
             const resData = res.data
             message.success(resData.message)
             handleAddMyPost()
@@ -107,7 +107,7 @@ const Post = ({ data, page, update, setIsSelect }) => {
                     key: '1',
                     label: (
                         <Button className='btn' onClick={() => {
-                            setIsSelect({ description, address, time_begin, time_end, star, images: null, post_id })
+                            setIsSelect({ description, address, time_begin, time_end, star, images: null, id })
                             update()
                         }}><EditOutlined /></Button>
                     ),
@@ -122,18 +122,6 @@ const Post = ({ data, page, update, setIsSelect }) => {
         />
     );
 
-    // const { Panel } = Collapse
-
-    // const mode = {
-    //     more: (<span style={{ fontWeight: 'bold' }}> ...See more</span>),
-    //     hide: (<span style={{ fontWeight: 'bold' }}> ...Hide</span>)
-    // }
-    // const [text, setText] = useState(mode.more)
-    // const changeText = () => {
-    //     console.log('change text');
-    //     setText(text === mode.more ? mode.hide : mode.more)
-    // }
-
     return (
         <div className="post" style={{ padding: '10px' }}>
             <div className="postWrapper">
@@ -142,7 +130,7 @@ const Post = ({ data, page, update, setIsSelect }) => {
                         <Avatar size={50} src={`/images/${user_id % 5 + 1}.png`} />
                         <div style={{ display: 'grid' }}>
                             <span className="postUsername" style={{ fontSize: '18px', fontWeight: 'bold' }} >{nickname}</span>
-                            <div style={{ marginLeft: '10px', fontStyle: 'italic' }}>{updated_at.split('.')[0]}</div>
+                            <div style={{ marginLeft: '10px', fontStyle: 'italic' }}>{moment(updated_at).fromNow()}</div>
                         </div>
                     </div>
                     <div className="postTopRight">
@@ -164,10 +152,9 @@ const Post = ({ data, page, update, setIsSelect }) => {
                 </div>
                 <div className="postCenter">
                     <span style={{ fontWeight: 'bold', fontSize: 16, display: 'grid', justifyContent: 'right' }}>
-                        <span>⏰<i> {time_begin.split('.')[0]} - {time_end.split('.')[0]}</i></span>
+                        <span>⏰<i>{moment(time_begin).format('HH:MM') + " - " + moment(time_end).format('HH:MM')}</i></span>
                         <Rate style={{ display: 'flex', justifyContent: 'right' }} disabled value={star} />
                     </span>
-                    {/* <div className="postText">{description.length < 200 ? description : (<span>{description.slice(0, 200)} <a onClick={changeText} >{text}</a></span>)}</div> */}
                     <div className="postText">{description}</div>
                     <div style={{ display: 'grid', justifyContent: 'center', alignContent: 'center' }}>
                         <Image
@@ -182,13 +169,13 @@ const Post = ({ data, page, update, setIsSelect }) => {
                 </div>
                 <Row className="postBottom" style={{ backgroundColor: '#efefef', borderRadius: '12px' }}>
                     <Col span={12} className="postBottomLeft hoverBtn" onClick={likePost} style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', padding: '10px' }}>
-                        <LikeOutlined className='likeIcon' style={{ color: liked === '0' ? 'black' : 'red', fontSize: '20px' }} />
-                        <span className="postLikeCounter" >{numLike}</span>
+                        <LikeOutlined className='likeIcon' style={{ color: like == '0' ? 'black' : 'red', fontSize: '20px' }} />
+                        <span className="postLikeCounter" >{numLikeComment.numLike}</span>
                         <span className="postLikeCounter" style={{ marginLeft: '5px' }}>  likes</span>
                     </Col>
                     <Col span={12} className="postBottomRight hoverBtn" onClick={handleGetComment} style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', padding: '10px' }}>
                         <CommentOutlined style={{ fontSize: '20px', color: 'blue', padding: '0 4px' }} />
-                        <span className="postCommentText">{numComment} comments</span>
+                        <span className="postCommentText">{numLikeComment.numComment} comments</span>
                     </Col>
                 </Row>
                 {commentInput.toggle &&
@@ -199,11 +186,13 @@ const Post = ({ data, page, update, setIsSelect }) => {
                                     <div style={{ display: 'flex' }}>
                                         <Avatar style={{ padding: '4px' }} size={35} src={`/images/${comment.user_id % 5 + 1}.png`} />
                                         <span style={{ fontSize: '16px', display: 'grid', justifyContent: 'left', alignContent: 'center', fontWeight: 'bold' }}>{comment.nickname}</span>
-                                        <span style={{ fontSize: '12px', display: 'grid', justifyContent: 'left', alignContent: 'center', fontStyle: 'italic', paddingLeft: '4px' }}> - {comment.created_at && comment.created_at.split('.')[0]}</span>
+                                        <span style={{ fontSize: '12px', display: 'grid', justifyContent: 'left', alignContent: 'center', fontStyle: 'italic', paddingLeft: '4px' }}> - {moment(comment.created_at).fromNow()}</span>
                                     </div>
-                                    <div>{comment.content}</div>
-                                    <LikeOutlined style={{ color: comment.Liked === '0' ? 'black' : 'red', fontSize: '16px', padding: '0 4px' }} onClick={() => handleLikeComment(comment.comment_id)} />
-                                    <span>{comment.numLike}</span>
+                                    <div style={{paddingLeft: '30px'}}>
+                                        <div>{comment.content}</div>
+                                        <LikeOutlined style={{ color: comment.Liked == '0' ? 'black' : 'red', fontSize: '16px', padding: '0 4px' }} onClick={() => handleLikeComment(comment.id)} />
+                                        <span>{comment.numLike}</span>
+                                    </div>
                                 </div>
                             ))}
                         <Input.Group compact style={{ padding: '8px 2px', borderBottom: '1px solid #bdbdbd' }}>
@@ -214,7 +203,6 @@ const Post = ({ data, page, update, setIsSelect }) => {
                                 value={commentInput.content}
                                 suffix={(<SendOutlined style={{ fontSize: '18px', color: '#3e8bff', paddingTop: '4px' }} onClick={handleComment} />)}
                                 onChange={(e) => setCommentInput({ ...commentInput, content: e.target.value })} />
-                            {/* <Button style={{ backgroundColor: '#ededed' }} onClick={handleComment}>Send</Button> */}
                         </Input.Group>
                     </div>
                 }

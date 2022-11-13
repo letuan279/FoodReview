@@ -28,7 +28,7 @@ const NavBar = () => {
     )
 
     return (
-        <div style={{ display: 'flex', width: '100%' }} >
+        <div style={{ display: 'flex', width: '100%', borderBottom: '2px solid', backgroundColor: 'white'}} >
             <div >
                 <Link to={'/home'}>
                     <Image
@@ -41,17 +41,6 @@ const NavBar = () => {
             </div>
             <div style={{ display: 'grid', alignContent: 'center', justifyContent: 'center', margin: '0 40px 0 auto', cursor: 'pointer' }}>
                 <Dropdown overlay={menu}>
-                    {/* <Row>
-                        <div span={6} style={{ padding: '2px', display: 'grid' }}>
-                            <Avatar size={50} src={`images/${user.id % 5 + 1}.png`} />
-                        </div>
-                        <div span={14} style={{ padding: '0 4px', display: 'grid', justifyContent: 'center', alignContent: 'center' }}>
-                            <div style={{ fontSize: '18px', display: 'grid', justifyContent: 'center', alignContent: 'center' }}>{user && user.nickname}</div>
-                        </div>
-                        <div span={2} className='center'>
-                            <DownOutlined />
-                        </div>
-                    </Row> */}
                     <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center' }} >
                         <Avatar size={50} src={`/images/${user.id % 5 + 1}.png`} />
                         <div style={{ fontSize: '18px', display: 'grid', justifyContent: 'center', alignContent: 'center', padding: '0 10px' }}>{user && user.nickname}</div>

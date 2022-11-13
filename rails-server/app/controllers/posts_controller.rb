@@ -16,8 +16,7 @@ class PostsController < ApplicationController
 
     def my_posts
         @user = authorized_user
-        data = Post.order(updated_at: :desc).find_by(user_id: @user.id).as_json
-        data = [data]
+        data = Post.order(updated_at: :desc).where(:user_id => @user.id).as_json
         new_data = data.map do |x|
             x[:numLike] = numLike(x['id'])
             x[:numComment] = numComment(x['id'])
@@ -122,7 +121,7 @@ class PostsController < ApplicationController
     end
 
     def numLikeCmt(comment_id)
-        LikeComment.where(comment_id: params[:comment_id]).count(:all)
+        LikeComment.where(comment_id: comment_id).count(:all)
     end
 
     def numComment(post_id)
@@ -136,7 +135,6 @@ class PostsController < ApplicationController
     def likedComment(user_id, comment_id)
         LikeComment.where(user_id: user_id, comment_id: comment_id).length == 0 ? 0 : 1
     end
-
 
     private
 
